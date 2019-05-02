@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
 import { Consumer } from '../../context';
 
 //Como é um componente não funcional, acedemos a variaveis através de  this.props, num componente funcional basta props.
@@ -16,11 +18,22 @@ class Contact extends Component {
     });
   };
 
-  onDeleteClick = (id, dispatch) => {
-    dispatch({
-      type: 'DELETE_CONTACT',
-      payload: id
-    });
+  //Quando se clica para apagar o contacto
+  onDeleteClick = async (id, dispatch) => {
+    try {
+      await axios.delete(`https://jsonplaceholder.typicode.com/users/${id}`);
+
+      dispatch({
+        type: 'DELETE_CONTACT',
+        payload: id
+      });
+    } catch (error) {
+      //Só para apagar mesmo da DOM, mas falhou com erro 404
+      dispatch({
+        type: 'DELETE_CONTACT',
+        payload: id
+      });
+    }
   };
 
   render() {
@@ -50,6 +63,16 @@ class Contact extends Component {
                   }}
                   onClick={this.onDeleteClick.bind(this, id, dispatch)}
                 />
+                <Link to={`/contact/edit/${id}`}>
+                  <i
+                    className="fas fa-pencil-alt mr-2"
+                    style={{
+                      cursor: 'pointer',
+                      float: 'right',
+                      color: 'black'
+                    }}
+                  />
+                </Link>
               </h4>
               {showContactInfo ? (
                 <ul className="list-group">
